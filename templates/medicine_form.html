@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+  <h3><i class="fas fa-pills me-2 text-teal"></i>{{ 'Edit' if med else 'Add New' }} Medicine</h3>
+  <p class="text-muted">{{ 'Update medicine details' if med else 'Add a new medicine to your inventory' }}</p>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card p-4">
+      <form method="post">
+        <div class="row mb-3">
+          <div class="col-md-8">
+            <label class="form-label fw-bold">Medicine Name *</label>
+            <input class="form-control form-control-lg" name="name" value="{{ med.name if med else '' }}" placeholder="e.g., Paracetamol 500mg" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Category *</label>
+            <input class="form-control form-control-lg" name="category" value="{{ med.category if med else '' }}" placeholder="e.g., Painkiller" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Price (PKR) *</label>
+            <div class="input-group">
+              <span class="input-group-text">PKR</span>
+              <input class="form-control" name="price" type="number" step="0.01" value="{{ med.price if med else '' }}" placeholder="0.00" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Quantity Available *</label>
+            <input class="form-control" name="quantity" type="number" value="{{ med.quantity if med else '' }}" placeholder="0" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Reorder Level</label>
+            <input class="form-control" name="reorder_level" type="number" value="20" placeholder="Alert when below this">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Expiry Date</label>
+            <input class="form-control" name="expiry_date" type="date" value="{{ med.expiry_date if med and med.expiry_date else '' }}">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Supplier</label>
+          <select class="form-select" name="supplier_id">
+            <option value="">-- Select Supplier --</option>
+            {% for sup in suppliers %}
+              <option value="{{ sup.id }}" {% if med and med.supplier_id==sup.id %}selected{% endif %}>{{ sup.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <hr>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-teal btn-lg">
+            <i class="fas fa-save me-2"></i>{{ 'Update Medicine' if med else 'Add Medicine' }}
+          </button>
+          <a href="/medicines" class="btn btn-outline-secondary btn-lg">
+            <i class="fas fa-arrow-left me-2"></i>Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card p-4 bg-light-teal">
+      <h6 class="fw-bold mb-3"><i class="fas fa-lightbulb me-2"></i>Tips</h6>
+      <ul class="small text-muted list-unstyled">
+        <li class="mb-2"><i class="fas fa-check-circle text-teal me-2"></i>Use consistent naming</li>
+        <li class="mb-2"><i class="fas fa-check-circle text-teal me-2"></i>Keep expiry dates updated</li>
+        <li class="mb-2"><i class="fas fa-check-circle text-teal me-2"></i>Set accurate reorder levels</li>
+        <li><i class="fas fa-check-circle text-teal me-2"></i>Review prices regularly</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

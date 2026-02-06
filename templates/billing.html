@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+  <h3><i class="fas fa-receipt me-2 text-teal"></i>Billing & Invoices</h3>
+  <p class="text-muted">Create and manage customer invoices</p>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card p-4">
+      <h5><i class="fas fa-file-invoice me-2"></i>New Invoice</h5>
+      <hr>
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Customer Name *</label>
+          <input class="form-control" name="customer_name" placeholder="Enter customer name" required>
+        </div>
+
+        <div class="mb-4">
+          <h6 class="fw-bold">Select Medicines</h6>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Medicine</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for m in medicines %}
+                <tr>
+                  <td class="fw-bold">{{ m.name }}</td>
+                  <td class="text-success">PKR {{ '%.2f'|format(m.price) }}</td>
+                  <td>
+                    <input class="form-control form-control-sm quantity-input" type="number" min="0" max="{{ m.quantity }}" name="qty_{{ m.id }}" value="0" data-price="{{ m.price }}">
+                  </td>
+                  <td class="total-price">0.00</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <hr>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5>Total Amount:</h5>
+          <h4 class="text-success"><span id="invoice-total">0.00</span> PKR</h4>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-teal" name="action" value="save">
+            <i class="fas fa-save me-2"></i>Save Invoice
+          </button>
+          <button type="submit" class="btn btn-success" name="action" value="pdf">
+            <i class="fas fa-file-pdf me-2"></i>Generate PDF
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card p-4 sticky-top" style="top: 20px;">
+      <h6 class="fw-bold mb-3"><i class="fas fa-info-circle me-2"></i>Invoice Summary</h6>
+      <div class="alert alert-info">
+        <small>Fill in customer name and select medicines to create an invoice.</small>
+      </div>
+      <div class="alert alert-success">
+        <small><strong>💡 Tip:</strong> Print or download as PDF for records.</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.quantity-input').forEach(input => {
+    input.addEventListener('change', function() {
+      const price = parseFloat(this.dataset.price);
+      const qty = parseInt(this.value) || 0;
+      const total = price * qty;
+      this.parentElement.nextElementSibling.textContent = total.toFixed(2);
+      updateTotal();
+    });
+  });
+
+  function updateTotal() {
+    const prices = document.querySelectorAll('.total-price');
+    let sum = 0;
+    prices.forEach(p => sum += parseFloat(p.textContent));
+    document.getElementById('invoice-total').textContent = sum.toFixed(2);
+  }
+</script>
+{% endblock %}

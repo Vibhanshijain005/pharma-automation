@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+  <h3><i class="fas fa-tachometer-alt me-2 text-teal"></i>Dashboard Overview</h3>
+  <p class="text-muted">Welcome back! Here's your pharmacy performance at a glance.</p>
+</div>
+
+<!-- KPI Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-md-3">
+    <div class="card p-4 text-center dashboard-card">
+      <div class="card-icon mb-3">
+        <i class="fas fa-capsules fa-3x text-teal"></i>
+      </div>
+      <h6 class="text-muted mb-2">Total Medicines</h6>
+      <h3 class="fw-bold">{{ total_medicines }}</h3>
+      <small class="text-success"><i class="fas fa-arrow-up me-1"></i>Products in stock</small>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card p-4 text-center dashboard-card warning-card">
+      <div class="card-icon mb-3">
+        <i class="fas fa-exclamation-triangle fa-3x" style="color: #e67e22;"></i>
+      </div>
+      <h6 class="text-muted mb-2">Low Stock Alert</h6>
+      <h3 class="fw-bold" style="color: #e67e22;">{{ low_stock }}</h3>
+      <small class="text-warning"><i class="fas fa-bell me-1"></i>Needs reordering</small>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card p-4 text-center dashboard-card danger-card">
+      <div class="card-icon mb-3">
+        <i class="fas fa-hourglass-end fa-3x" style="color: #e74c3c;"></i>
+      </div>
+      <h6 class="text-muted mb-2">Expiring Soon</h6>
+      <h3 class="fw-bold" style="color: #e74c3c;">{{ upcoming_expiry }}</h3>
+      <small class="text-danger"><i class="fas fa-calendar-times me-1"></i>Within 30 days</small>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card p-4 text-center dashboard-card success-card">
+      <div class="card-icon mb-3">
+        <i class="fas fa-money-bill-wave fa-3x text-success"></i>
+      </div>
+      <h6 class="text-muted mb-2">Sales Today</h6>
+      <h3 class="fw-bold text-success">{{ sales_today }}</h3>
+      <small class="text-success"><i class="fas fa-chart-line me-1"></i>Today's transactions</small>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Sales Section -->
+<div class="card p-4 mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Sales</h5>
+    <a href="/reports" class="btn btn-sm btn-teal">View All Reports</a>
+  </div>
+  
+  {% if recent_sales %}
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th><i class="fas fa-user me-2"></i>Customer Name</th>
+          <th><i class="fas fa-dollar-sign me-2"></i>Amount</th>
+          <th><i class="fas fa-calendar me-2"></i>Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in recent_sales %}
+        <tr class="sale-row">
+          <td class="fw-500"><a href="/sale/{{ s.id }}" class="text-decoration-none">{{ s.customer_name }}</a></td>
+          <td class="text-success fw-bold">PKR {{ '%.2f'|format(s.total) }}</td>
+          <td>{{ s.date.strftime('%d %b %Y, %H:%M') }}</td>
+          <td><span class="badge bg-success">Completed</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>No sales records yet. Start by adding medicines and customers.
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .dashboard-card {
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #FFFEF9 0%, #FAF4EC 100%);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .dashboard-card:hover {
+    transform: translateY(-12px) rotateX(2deg);
+    box-shadow: 0 15px 40px rgba(44, 120, 115, 0.2);
+  }
+
+  .card-icon {
+    animation: bounceIcon 2s infinite;
+  }
+
+  @keyframes bounceIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .dashboard-card:hover .card-icon {
+    animation: none;
+    transform: scale(1.2);
+  }
+
+  .sale-row {
+    animation: slideInLeft 0.5s ease-out forwards;
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: #f5f0e8;
+  }
+</style>
+{% endblock %}

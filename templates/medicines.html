@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3><i class="fas fa-pills me-2 text-teal"></i>Medicines Inventory</h3>
+    <p class="text-muted">Manage your medicine stock and details</p>
+  </div>
+  <a class="btn btn-teal btn-lg" href="/medicine/add">
+    <i class="fas fa-plus me-2"></i>Add Medicine
+  </a>
+</div>
+
+<!-- Search Bar -->
+<div class="card p-3 mb-4">
+  <form method="get" class="d-flex gap-2">
+    <input type="text" class="form-control" name="q" placeholder="Search by medicine name, category..." value="{{ q }}">
+    <button type="submit" class="btn btn-teal">
+      <i class="fas fa-search me-2"></i>Search
+    </button>
+    {% if q %}
+    <a href="/medicines" class="btn btn-outline-secondary">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Medicines Table -->
+<div class="card p-0 overflow-hidden">
+  {% if medicines.items %}
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th><i class="fas fa-tablets me-2"></i>Medicine Name</th>
+          <th><i class="fas fa-folder me-2"></i>Category</th>
+          <th><i class="fas fa-money-bill me-2"></i>Price (PKR)</th>
+          <th><i class="fas fa-cubes me-2"></i>Quantity</th>
+          <th><i class="fas fa-calendar-times me-2"></i>Expiry Date</th>
+          <th><i class="fas fa-tools me-2"></i>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in medicines.items %}
+        <tr class="medicine-row" data-medicine-id="{{ m.id }}">
+          <td class="fw-bold">
+            <span class="badge bg-light text-dark me-2">{{ m.name }}</span>
+          </td>
+          <td>
+            <span class="badge bg-info">{{ m.category }}</span>
+          </td>
+          <td class="text-success fw-bold">{{ '%.2f'|format(m.price) }}</td>
+          <td>
+            {% if m.quantity < 20 %}
+            <span class="badge bg-danger">{{ m.quantity }} ⚠️</span>
+            {% else %}
+            <span class="badge bg-success">{{ m.quantity }}</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if m.expiry_date %}
+            <span class="text-muted">{{ m.expiry_date.strftime('%d %b %Y') }}</span>
+            {% else %}
+            <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+          <td>
+            <a class="btn btn-sm btn-secondary" href="/medicine/edit/{{ m.id }}" title="Edit">
+              <i class="fas fa-edit"></i> Edit
+            </a>
+            <form method="post" action="/medicine/delete/{{ m.id }}" style="display:inline">
+              <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this medicine?')" title="Delete">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="p-5 text-center">
+    <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+    <p class="text-muted mb-3">No medicines found</p>
+    <a href="/medicine/add" class="btn btn-teal">
+      <i class="fas fa-plus me-2"></i>Add Your First Medicine
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Pagination -->
+{% if medicines.pages > 1 %}
+<nav aria-label="Page navigation" class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% if medicines.has_prev %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1&q={{ q }}"><i class="fas fa-step-backward"></i></a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ medicines.prev_num }}&q={{ q }}">&previous</a>
+      </li>
+    {% endif %}
+
+    {% for page_num in medicines.iter_pages() %}
+      {% if page_num %}
+        {% if page_num == medicines.page %}
+          <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_num }}&q={{ q }}">{{ page_num }}</a></li>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {% if medicines.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ medicines.next_num }}&q={{ q }}">next ></a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ medicines.pages }}&q={{ q }}"><i class="fas fa-step-forward"></i></a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+<style>
+  .medicine-row {
+    animation: slideInUp 0.4s ease-out forwards;
+    opacity: 0;
+  }
+
+  {% for i in range(medicines.items|length) %}
+    .medicine-row:nth-child({{ i + 1 }}) {
+      animation-delay: {{ (i * 0.05) }}s;
+    }
+  {% endfor %}
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .medicine-row:hover {
+    background: #f5f0e8 !important;
+    border-left: 4px solid #2c7873;
+  }
+
+  .btn-secondary:hover, .btn-danger:hover {
+    transform: scale(1.05);
+  }
+</style>
+{% endblock %}

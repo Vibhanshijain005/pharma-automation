@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+  <h3><i class="fas fa-truck me-2 text-teal"></i>Suppliers Directory</h3>
+  <p class="text-muted">Manage supplier information and contacts</p>
+</div>
+
+<div class="mb-3">
+  <form class="row g-2" method="post" action="/supplier/add">
+    <div class="col-auto">
+      <input name="name" class="form-control form-control-sm" placeholder="Supplier name" required>
+    </div>
+    <div class="col-auto">
+      <input name="phone" class="form-control form-control-sm" placeholder="Phone">
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-teal btn-sm" type="submit"><i class="fas fa-plus me-2"></i>Add Supplier</button>
+    </div>
+  </form>
+</div>
+
+<div class="card p-0 overflow-hidden">
+  {% if suppliers %}
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th><i class="fas fa-industry me-2"></i>Supplier Name</th>
+          <th><i class="fas fa-envelope me-2"></i>Email</th>
+          <th><i class="fas fa-phone me-2"></i>Phone</th>
+          <th><i class="fas fa-map-marker-alt me-2"></i>Address</th>
+          <th><i class="fas fa-boxes me-2"></i>Products</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in suppliers %}
+        <tr class="supplier-row">
+          <td class="fw-bold"><i class="fas fa-check-circle text-success me-2"></i>{{ s.name }}</td>
+          <td>{{ s.email if s.email else '-' }}</td>
+          <td>{{ s.phone if s.phone else '-' }}</td>
+          <td>{{ s.address if s.address else '-' }}</td>
+          <td><span class="badge bg-teal">{{ s.medicines|length }} items</span></td>
+          <td>
+            <a class="btn btn-sm btn-outline-secondary me-1" href="/supplier/edit/{{ s.id }}"><i class="fas fa-edit"></i></a>
+            <form method="post" action="/supplier/delete/{{ s.id }}" style="display:inline" onsubmit="return confirm('Delete supplier?');">
+              <button class="btn btn-sm btn-danger" type="submit"><i class="fas fa-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="p-5 text-center">
+    <i class="fas fa-truck fa-4x text-muted mb-3"></i>
+    <p class="text-muted">No suppliers registered</p>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .supplier-row { animation: slideInUp 0.4s ease-out forwards; opacity: 0; }
+  @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; } }
+  .supplier-row:hover { background: #f5f0e8 !important; border-left: 4px solid #2c7873; }
+</style>
+{% endblock %}
